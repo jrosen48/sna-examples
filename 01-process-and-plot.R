@@ -72,5 +72,5 @@ ggraph(g, layout = 'linear', circular=TRUE) +
     geom_edge_arc(alpha=.25,
                    aes(start_cap = label_rect(node1.name),
                        end_cap = label_rect(node2.name)),
-                   arrow = arrow(length = unit(2, 'mm'))) + 
+                   arrow = arrow(length = unit(1, 'mm'))) + 
     geom_node_text(aes(label = name))
