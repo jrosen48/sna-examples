@@ -2,54 +2,49 @@
 ## load packages
 ## --------------------------------------------------------------
 
+# moved these to be together at the top this way, if folks need to see if they
+# can run the script they can check all the dependencies here
 library(tidyverse)
-library(janitor)
+library(readxl)
+library(igraph)  # for processing
+library(ggraph)  # for visualizing
+# library(dplyr) # loaded by tidyverse 
+# library(tidyr) # same
 
 ## --------------------------------------------------------------
 ## read in data
 ## --------------------------------------------------------------
 
-library(readxl)
-
 d <- read_excel("group-nominations.xlsx")
 names(d) <- c("sender", "receivers")
-d
 
 students <- unique(d$sender)  # complete list of students
-
 
 ## --------------------------------------------------------------
 ## create edgelist
 ## see https://stackoverflow.com/posts/43409986/revisions
 ## --------------------------------------------------------------
 
-library(dplyr)
-library(tidyr)
-
 d2 <- d %>% 
     mutate(receivers = strsplit(receivers, split = ", ")) %>%
     unnest(receivers) %>%
     select(sender, receivers)
 
-el <- as.matrix(d2)
+el <- as.matrix(d2) # being (nit-)picky, what does el stand for?
 
 ## --------------------------------------------------------------
 ## create a graph
 ## see http://igraph.org/r/doc/aaa-igraph-package.html
 ## --------------------------------------------------------------
 
-library(igraph)  # for processing
-
-g <- graph_from_edgelist(el, directed=TRUE)
+g <- graph_from_edgelist(el, directed = TRUE)
 
 # plot.igraph(g)  # ugly plot, shouldn't use
-
 
 ## --------------------------------------------------------------
 ## add plotting function
 ## see https://www.data-imaginist.com/2017/ggraph-introduction-layouts/
 ## --------------------------------------------------------------
-library(ggraph)  # for visualizing
 
 ggraph(g, layout = 'kk', maxiter=1) + 
     geom_edge_link(alpha=.25) +
