@@ -28,7 +28,21 @@ students <- unique(d$sender)  # complete list of students
 d2 <- d %>% 
     mutate(receivers = strsplit(receivers, split = ", ")) %>%
     unnest(receivers) %>%
-    select(sender, receivers)
+    select(sender, receivers) # minor, consider changing receivers to receiver (singular)
+# didn't make yet as this will lead to some changes below and possible confusion
+
+# create edgelist with weight via rank_prop
+d3 <- d %>% 
+    mutate(receivers = strsplit(receivers, split = ", ")) %>%
+    unnest(receivers) %>%
+    select(sender, receivers) %>% 
+    group_by(sender) %>% 
+    mutate(rank = row_number()) %>% 
+    arrange(sender, desc(rank)) %>% 
+    mutate(rev_rank = row_number()) %>% 
+    arrange(sender, rank) %>% 
+    mutate(rank_prop = rev_rank/sum(rev_rank)) %>% 
+    select(sender, receiver = receivers, rank, rank_prop)
 
 el <- as.matrix(d2) # being (nit-)picky, what does el stand for?
 
@@ -46,9 +60,9 @@ g <- graph_from_edgelist(el, directed = TRUE)
 ## see https://www.data-imaginist.com/2017/ggraph-introduction-layouts/
 ## --------------------------------------------------------------
 
-# ggraph(g, layout = 'kk', maxiter=1) + 
-#     geom_edge_link(alpha=.25) +
-#     geom_node_point()
+ggraph(g, layout = 'kk', maxiter=1) +
+    geom_edge_link(alpha=.25) +
+    geom_node_point()
 # 
 # ggraph(g, layout = 'linear', circular=TRUE) + 
 #     geom_edge_arc(alpha=.25) + 
