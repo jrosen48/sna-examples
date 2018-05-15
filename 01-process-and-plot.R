@@ -53,6 +53,14 @@ el <- as.matrix(d2) # being (nit-)picky, what does el stand for?
 
 g <- graph_from_edgelist(el, directed = TRUE)
 
+# check this function out 
+# doesn't require you to coerce to a matrix and treats every additional column as a vertex attribute
+g2 <- graph_from_data_frame(d3, directed = TRUE)
+
+# here's in-degree simply using the number of relations
+# we'll need to (manually?) calculate our version using rank prop
+degree(g2, mode = "in")
+
 # plot.igraph(g)  # ugly plot, shouldn't use
 
 ## --------------------------------------------------------------
@@ -79,7 +87,20 @@ ggraph(g, layout = 'kk', maxiter=1) +
 ## Bret thinks this plot is the best:
 ggraph(g, layout = 'linear', circular=TRUE) + 
     geom_edge_arc(alpha=.25,
-                   aes(start_cap = label_rect(node1.name),
+                  aes(start_cap = label_rect(node1.name),
+                      end_cap = label_rect(node2.name)),
+                  arrow = arrow(length = unit(1, 'mm'))) + 
+    geom_node_text(aes(label = name))
+
+# Josh version
+# I think my widths aren't working...
+ggraph(g2, layout = 'linear', circular=TRUE) + 
+    geom_edge_arc(alpha = .25,
+                   aes(edge_width = rank_prop,
+                       start_cap = label_rect(node1.name),
                        end_cap = label_rect(node2.name)),
                    arrow = arrow(length = unit(1, 'mm'))) + 
-    geom_node_text(aes(label = name))
+    geom_node_text(aes(label = name)) +
+    scale_edge_width(range = c(1, 1.5)) +
+    theme_graph() +
+    theme(legend.position = "none")
