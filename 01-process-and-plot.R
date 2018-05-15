@@ -28,8 +28,7 @@ students <- unique(d$sender)  # complete list of students
 d2 <- d %>% 
     mutate(receivers = strsplit(receivers, split = ", ")) %>%
     unnest(receivers) %>%
-    select(sender, receivers) # minor, consider changing receivers to receiver (singular)
-# didn't make yet as this will lead to some changes below and possible confusion
+    select(sender, receivers) # minor, consider changing receivers to receiver (singular) - I didn't make yet as this will lead to some changes below and possible confusion
 
 # create edgelist with weight via rank_prop
 d3 <- d %>% 
