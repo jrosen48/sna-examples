@@ -46,21 +46,21 @@ g <- graph_from_edgelist(el, directed = TRUE)
 ## see https://www.data-imaginist.com/2017/ggraph-introduction-layouts/
 ## --------------------------------------------------------------
 
-ggraph(g, layout = 'kk', maxiter=1) + 
-    geom_edge_link(alpha=.25) +
-    geom_node_point()
-
-ggraph(g, layout = 'linear', circular=TRUE) + 
-    geom_edge_arc(alpha=.25) + 
-    geom_node_point() +
-    coord_fixed()
-
-ggraph(g, layout = 'linear', circular=TRUE) + 
-    geom_edge_link(alpha=.25,
-        aes(start_cap = label_rect(node1.name),
-        end_cap = label_rect(node2.name)),
-        arrow = arrow(length = unit(2, 'mm'))) + 
-    geom_node_text(aes(label = name))
+# ggraph(g, layout = 'kk', maxiter=1) + 
+#     geom_edge_link(alpha=.25) +
+#     geom_node_point()
+# 
+# ggraph(g, layout = 'linear', circular=TRUE) + 
+#     geom_edge_arc(alpha=.25) + 
+#     geom_node_point() +
+#     coord_fixed()
+# 
+# ggraph(g, layout = 'linear', circular=TRUE) + 
+#     geom_edge_link(alpha=.25,
+#         aes(start_cap = label_rect(node1.name),
+#         end_cap = label_rect(node2.name)),
+#         arrow = arrow(length = unit(2, 'mm'))) + 
+#     geom_node_text(aes(label = name))
 
 ## Bret thinks this plot is the best:
 ggraph(g, layout = 'linear', circular=TRUE) + 
