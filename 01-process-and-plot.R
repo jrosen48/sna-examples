@@ -104,7 +104,7 @@ node_size <- degree(g2, mode = "in")
 #    theme_graph() +
 #    theme(legend.position = "none")
 
-# Version 3.0 (Bret)
+# Version 3.0 (Bret) # circular layout
 ggraph(g2, layout = 'linear', circular=TRUE) + 
     geom_edge_arc(alpha=.5, # changes darkness of lines
                   aes(edge_width = rank_prop^2)) + # changes width of lines
@@ -117,4 +117,19 @@ ggraph(g2, layout = 'linear', circular=TRUE) +
                     repel = TRUE, # bumps labels away from nodes
                     point.padding = unit(.1, "lines"),
                     label.padding = unit(.15, "lines"),
-                    label.size = .1)
+                    label.size = .1) # only adjusts the width of label border
+
+# Version 4.0 (Bret) # default layout, shows centrality
+ggraph(g2, layout = 'nicely') + 
+    geom_edge_link(alpha=.5, # changes darkness of lines
+                  aes(edge_width = rank_prop^2)) + # changes width of lines
+    scale_edge_width(range = c(.5, 3)) + # possible range of line widths
+    theme_graph() +
+    theme(legend.position = "none") +
+    geom_node_point(aes(size = node_size)) + # changes node size
+    scale_size(range = c(1,10)) + # possible range of node sizes
+    geom_node_label(aes(label = name),
+                    repel = TRUE, # bumps labels away from nodes
+                    point.padding = unit(.1, "lines"),
+                    label.padding = unit(.15, "lines"),
+                    label.size = .1) # only adjusts the width of label border
