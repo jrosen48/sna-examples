@@ -16,7 +16,7 @@ library(ggraph)  # for visualizing
 ## --------------------------------------------------------------
 
 d <- read_excel("group-nominations.xlsx")
-names(d) <- c("sender", "receivers")
+names(d) <- c("sender", "receiver")
 
 students <- unique(d$sender)  # complete list of students
 
@@ -26,22 +26,22 @@ students <- unique(d$sender)  # complete list of students
 ## --------------------------------------------------------------
 
 d2 <- d %>% 
-    mutate(receivers = strsplit(receivers, split = ", ")) %>%
-    unnest(receivers) %>%
-    select(sender, receivers) # minor, consider changing receivers to receiver (singular) - I didn't make yet as this will lead to some changes below and possible confusion
+    mutate(receiver = strsplit(receiver, split = ", ")) %>%
+    unnest(receiver) %>%
+    select(sender, receiver)
 
 # create edgelist with weight via rank_prop
 d3 <- d %>% 
-    mutate(receivers = strsplit(receivers, split = ", ")) %>%
-    unnest(receivers) %>%
-    select(sender, receivers) %>% 
+    mutate(receiver = strsplit(receiver, split = ", ")) %>%
+    unnest(receiver) %>%
+    select(sender, receiver) %>% 
     group_by(sender) %>% 
     mutate(rank = row_number()) %>% 
     arrange(sender, desc(rank)) %>% 
     mutate(rev_rank = row_number()) %>% 
     arrange(sender, rank) %>% 
     mutate(rank_prop = rev_rank/sum(rev_rank)) %>% 
-    select(sender, receiver = receivers, rank, rank_prop)
+    select(sender, receiver = receiver, rank, rank_prop)
 
 el <- as.matrix(d2) # being (nit-)picky, what does el stand for?
 
@@ -67,9 +67,9 @@ degree(g2, mode = "in")
 ## see https://www.data-imaginist.com/2017/ggraph-introduction-layouts/
 ## --------------------------------------------------------------
 
-ggraph(g, layout = 'kk', maxiter=1) +
-    geom_edge_link(alpha=.25) +
-    geom_node_point()
+# ggraph(g, layout = 'kk', maxiter=1) +
+#    geom_edge_link(alpha=.25) +
+#    geom_node_point()
 # 
 # ggraph(g, layout = 'linear', circular=TRUE) + 
 #     geom_edge_arc(alpha=.25) + 
@@ -83,7 +83,7 @@ ggraph(g, layout = 'kk', maxiter=1) +
 #         arrow = arrow(length = unit(2, 'mm'))) + 
 #     geom_node_text(aes(label = name))
 
-## Bret thinks this plot is the best:
+# Version 1.0 (Bret)
 ggraph(g, layout = 'linear', circular=TRUE) + 
     geom_edge_arc(alpha=.25,
                   aes(start_cap = label_rect(node1.name),
@@ -91,7 +91,7 @@ ggraph(g, layout = 'linear', circular=TRUE) +
                   arrow = arrow(length = unit(1, 'mm'))) + 
     geom_node_text(aes(label = name))
 
-# Josh version
+# Version 2.0 (Josh)
 # I think my widths aren't working...
 ggraph(g2, layout = 'linear', circular=TRUE) + 
     geom_edge_arc(alpha = .25,
@@ -103,3 +103,18 @@ ggraph(g2, layout = 'linear', circular=TRUE) +
     scale_edge_width(range = c(1, 1.5)) +
     theme_graph() +
     theme(legend.position = "none")
+
+# Version 3.0 (Bret)
+# the label masks the nodes, but I think they look a lot cleaner
+# edge scaling seems to be working ok
+ggraph(g2, layout = 'linear', circular=TRUE) + 
+    geom_edge_arc(alpha=.1,
+                  aes(edge_width = rank_prop)) + 
+    scale_edge_width(range = c(.25, 2)) +
+    theme_graph() +
+    theme(legend.position = "none") +
+    geom_node_label(aes(label = name),
+                   label.padding = unit(.15, "lines"),
+                   label.size = .1)
+
+
