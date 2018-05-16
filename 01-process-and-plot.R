@@ -58,7 +58,7 @@ g2 <- graph_from_data_frame(d3, directed = TRUE)
 
 # here's in-degree simply using the number of relations
 # we'll need to (manually?) calculate our version using rank prop
-degree(g2, mode = "in")
+node_size <- degree(g2, mode = "in")
 
 # plot.igraph(g)  # ugly plot, shouldn't use
 
@@ -106,23 +106,15 @@ degree(g2, mode = "in")
 
 # Version 3.0 (Bret)
 ggraph(g2, layout = 'linear', circular=TRUE) + 
-    geom_edge_arc(alpha=.25,
-                  aes(edge_width = rank_prop^2)) + 
-    scale_edge_width(range = c(.5, 3)) +
+    geom_edge_arc(alpha=.5, # changes darkness of lines
+                  aes(edge_width = rank_prop^2)) + # changes width of lines
+    scale_edge_width(range = c(.5, 3)) + # possible range of line widths
     theme_graph() +
     theme(legend.position = "none") +
+    geom_node_point(aes(size = node_size)) + # changes node size
+        scale_size(range = c(1,10)) + # possible range of node sizes
     geom_node_label(aes(label = name),
+                    repel = TRUE, # bumps labels away from nodes
+                    point.padding = unit(.1, "lines"),
                     label.padding = unit(.15, "lines"),
                     label.size = .1)
-
-ggraph(g2, layout = 'linear', circular=TRUE) + 
-    geom_edge_arc(alpha=.25,
-                  aes(edge_width = rank_prop^2)) + 
-    scale_edge_width(range = c(.5, 3)) +
-    theme_graph() +
-    theme(legend.position = "none") +
-    geom_node_label(aes(label = name),
-                    label.padding = unit(.15, "lines"),
-                    label.size = .1)
-
-
