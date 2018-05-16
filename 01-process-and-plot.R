@@ -43,7 +43,7 @@ d3 <- d %>%
     mutate(rank_prop = rev_rank/sum(rev_rank)) %>% 
     select(sender, receiver = receiver, rank, rank_prop)
 
-el <- as.matrix(d2) # being (nit-)picky, what does el stand for?
+el <- as.matrix(d2) # el = "edgelist"
 
 ## --------------------------------------------------------------
 ## create a graph
@@ -84,37 +84,45 @@ degree(g2, mode = "in")
 #     geom_node_text(aes(label = name))
 
 # Version 1.0 (Bret)
-ggraph(g, layout = 'linear', circular=TRUE) + 
-    geom_edge_arc(alpha=.25,
-                  aes(start_cap = label_rect(node1.name),
-                      end_cap = label_rect(node2.name)),
-                  arrow = arrow(length = unit(1, 'mm'))) + 
-    geom_node_text(aes(label = name))
+#ggraph(g, layout = 'linear', circular=TRUE) + 
+#    geom_edge_arc(alpha=.25,
+#                  aes(start_cap = label_rect(node1.name),
+#                      end_cap = label_rect(node2.name)),
+#                  arrow = arrow(length = unit(1, 'mm'))) + 
+#    geom_node_text(aes(label = name))
 
 # Version 2.0 (Josh)
 # I think my widths aren't working...
-ggraph(g2, layout = 'linear', circular=TRUE) + 
-    geom_edge_arc(alpha = .25,
-                   aes(edge_width = rank_prop,
-                       start_cap = label_rect(node1.name),
-                       end_cap = label_rect(node2.name)),
-                   arrow = arrow(length = unit(1, 'mm'))) + 
-    geom_node_text(aes(label = name)) +
-    scale_edge_width(range = c(1, 1.5)) +
-    theme_graph() +
-    theme(legend.position = "none")
+#ggraph(g2, layout = 'linear', circular=TRUE) + 
+#    geom_edge_arc(alpha = .25,
+#                   aes(edge_width = rank_prop,
+#                       start_cap = label_rect(node1.name),
+#                       end_cap = label_rect(node2.name)),
+#                   arrow = arrow(length = unit(1, 'mm'))) + 
+#    geom_node_text(aes(label = name)) +
+#    scale_edge_width(range = c(1, 1.5)) +
+#    theme_graph() +
+#    theme(legend.position = "none")
 
 # Version 3.0 (Bret)
-# the label masks the nodes, but I think they look a lot cleaner
-# edge scaling seems to be working ok
 ggraph(g2, layout = 'linear', circular=TRUE) + 
-    geom_edge_arc(alpha=.1,
-                  aes(edge_width = rank_prop)) + 
-    scale_edge_width(range = c(.25, 2)) +
+    geom_edge_arc(alpha=.25,
+                  aes(edge_width = rank_prop^2)) + 
+    scale_edge_width(range = c(.5, 3)) +
     theme_graph() +
     theme(legend.position = "none") +
     geom_node_label(aes(label = name),
-                   label.padding = unit(.15, "lines"),
-                   label.size = .1)
+                    label.padding = unit(.15, "lines"),
+                    label.size = .1)
+
+ggraph(g2, layout = 'linear', circular=TRUE) + 
+    geom_edge_arc(alpha=.25,
+                  aes(edge_width = rank_prop^2)) + 
+    scale_edge_width(range = c(.5, 3)) +
+    theme_graph() +
+    theme(legend.position = "none") +
+    geom_node_label(aes(label = name),
+                    label.padding = unit(.15, "lines"),
+                    label.size = .1)
 
 
