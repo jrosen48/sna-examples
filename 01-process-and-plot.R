@@ -38,6 +38,14 @@ d3 <- d %>%
     mutate(rank_prop = rev_rank/sum(rev_rank)) %>% 
     select(sender, receiver = receiver, rank, rank_prop)
 
+# Exploring direction
+
+d %>% filter(sender == "Abby" | sender == "Eli")
+
+d3 %>% 
+    filter(sender == "Eli" & receiver == "Abby" |
+               sender == "Abby" & receiver == "Eli")
+
 ## --------------------------------------------------------------
 ## create a graph
 ## see http://igraph.org/r/doc/aaa-igraph-package.html
@@ -59,14 +67,16 @@ node_size <- degree(g2, mode = "in")
 # Version 4.0 (Bret) # default layout, shows centrality
 ggraph(g2, layout = 'nicely') + 
     geom_edge_link(alpha=.5, # changes darkness of lines
-                  aes(edge_width = rank_prop^2)) + # changes width of lines
-    scale_edge_width(range = c(.5, 3)) + # possible range of line widths
-    theme_graph() +
-    theme(legend.position = "none") +
-    geom_node_point(aes(size = node_size)) + # changes node size
-    scale_size(range = c(1,10)) + # possible range of node sizes
+                  aes(edge_width = rank_prop^2), # changes width of lines
+                  arrow = arrow(length = unit(4, 'mm')), 
+                   end_cap = circle(3, 'mm')) + 
     geom_node_label(aes(label = name),
                     repel = TRUE, # bumps labels away from nodes
                     point.padding = unit(.1, "lines"),
                     label.padding = unit(.15, "lines"),
-                    label.size = .1) # only adjusts the width of label border
+                    label.size = .1) + # only adjusts the width of label border 
+    scale_edge_width(range = c(.5, 3)) + # possible range of line widths
+    theme_graph() +
+    theme(legend.position = "none") +
+    geom_node_point(aes(size = node_size)) + # changes node size
+    scale_size(range = c(1,10)) # possible range of node sizes
