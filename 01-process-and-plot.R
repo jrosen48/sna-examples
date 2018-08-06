@@ -2,14 +2,11 @@
 ## load packages
 ## --------------------------------------------------------------
 
-# moved these to be together at the top this way, if folks need to see if they
-# can run the script they can check all the dependencies here
 library(tidyverse)
 library(readxl)
 library(igraph)  # for processing
 library(ggraph)  # for visualizing
-# library(dplyr) # loaded by tidyverse 
-# library(tidyr) # same
+
 
 ## --------------------------------------------------------------
 ## read in data
@@ -22,13 +19,8 @@ students <- unique(d$sender)  # complete list of students
 
 ## --------------------------------------------------------------
 ## create edgelist
-## see https://stackoverflow.com/posts/43409986/revisions
+## see https://stackoverflow.com/questions/43409756/r-efficiently-separate-groups-in-data-frame/43409986#43409986
 ## --------------------------------------------------------------
-
-d2 <- d %>% 
-    mutate(receiver = strsplit(receiver, split = ", ")) %>%
-    unnest(receiver) %>%
-    select(sender, receiver)
 
 # create edgelist with weight via rank_prop
 d3 <- d %>% 
@@ -43,7 +35,13 @@ d3 <- d %>%
     mutate(rank_prop = rev_rank/sum(rev_rank)) %>% 
     select(sender, receiver = receiver, rank, rank_prop)
 
-el <- as.matrix(d2) # el = "edgelist"
+
+el <- d %>%  # el = "edgelist"
+    mutate(receiver = strsplit(receiver, split = ", ")) %>%
+    unnest(receiver) %>%
+    select(sender, receiver) %>%
+    as.matrix
+
 
 ## --------------------------------------------------------------
 ## create a graph
@@ -52,8 +50,8 @@ el <- as.matrix(d2) # el = "edgelist"
 
 g <- graph_from_edgelist(el, directed = TRUE)
 
-# check this function out 
-# doesn't require you to coerce to a matrix and treats every additional column as a vertex attribute
+
+# this function doesn't require you to coerce to a matrix and treats every additional column as a vertex attribute
 g2 <- graph_from_data_frame(d3, directed = TRUE)
 
 # here's in-degree simply using the number of relations
@@ -105,19 +103,19 @@ node_size <- degree(g2, mode = "in")
 #    theme(legend.position = "none")
 
 # Version 3.0 (Bret) # circular layout
-ggraph(g2, layout = 'linear', circular=TRUE) + 
-    geom_edge_arc(alpha=.5, # changes darkness of lines
-                  aes(edge_width = rank_prop^2)) + # changes width of lines
-    scale_edge_width(range = c(.5, 3)) + # possible range of line widths
-    theme_graph() +
-    theme(legend.position = "none") +
-    geom_node_point(aes(size = node_size)) + # changes node size
-        scale_size(range = c(1,10)) + # possible range of node sizes
-    geom_node_label(aes(label = name),
-                    repel = TRUE, # bumps labels away from nodes
-                    point.padding = unit(.1, "lines"),
-                    label.padding = unit(.15, "lines"),
-                    label.size = .1) # only adjusts the width of label border
+#ggraph(g2, layout = 'linear', circular=TRUE) + 
+#    geom_edge_arc(alpha=.5, # changes darkness of lines
+#                  aes(edge_width = rank_prop^2)) + # changes width of lines
+#    scale_edge_width(range = c(.5, 3)) + # possible range of line widths
+#    theme_graph() +
+#    theme(legend.position = "none") +
+#    geom_node_point(aes(size = node_size)) + # changes node size
+#        scale_size(range = c(1,10)) + # possible range of node sizes
+#    geom_node_label(aes(label = name),
+#                    repel = TRUE, # bumps labels away from nodes
+#                    point.padding = unit(.1, "lines"),
+#                    label.padding = unit(.15, "lines"),
+#                    label.size = .1) # only adjusts the width of label border
 
 # Version 4.0 (Bret) # default layout, shows centrality
 ggraph(g2, layout = 'nicely') + 
